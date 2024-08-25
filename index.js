@@ -76,16 +76,16 @@ app.post("/register",async (request,response)=>{
         "${username}","${email}","${hashedPassword}"
       );`;
      await db.run(query)
-      response.send("successfully Registered");
+      response.send({message:"successfully Registered"});
       
      }else{
       response.status(400)
-      response.send("User Already Exists")
+      response.send({error_msg:"User Already Exists"})
      }
     
     }
     catch(e){
-      console.log(`DB Error is ${e.message}`)
+      console.log({error_msg:`DB Error is ${e.message}`})
     }
   })
   
@@ -96,7 +96,7 @@ app.post("/register",async (request,response)=>{
     const dbUser=await db.get(selectUser)
     if (dbUser===undefined){
       response.status(400)
-      response.send("Invalid User")
+      response.send({error_msg:"Invalid User"})
     }else{
       isPasswordMatch= await bcrypt.compare(password,dbUser.password); 
       if (isPasswordMatch===true){
@@ -107,7 +107,7 @@ app.post("/register",async (request,response)=>{
         
       }else{
         response.status(400)
-        response.send("Invalid Password")
+        response.send({error_msg:"Invalid Password"})
       }
     }
   
@@ -157,7 +157,7 @@ app.post("/posts",authenticateAPI,async (request,response)=>{
         const {title,imageUrl,avatarUrl,author,topic,content}=request.body;
         const insertNewPost=`INSERT INTO post(title,image_url,avatar_url,author,topic,content) VALUES("${title}","${imageUrl}","${avatarUrl}","${author}","${topic}","${content}");`;
         await db.run(insertNewPost)
-        response.status(201).send("Post created successfully")
+        response.status(201).send({message:"Post created successfully"})
     }catch(e){
         response.status(500).json({message:e.message})
     }
@@ -169,7 +169,7 @@ app.put("/posts/:id",authenticateAPI,async (request,response)=>{
         const {title, imageUrl,avatarUrl,author,topic,content}=request.body;
         const updatePost=`UPDATE post SET title="${title}", image_url="${imageUrl}", avatar_url="${avatarUrl}", author="${author}", topic="${topic}", content="${content}" WHERE id=${id};`;
         await db.run(updatePost)
-        response.status(200).send("Post updated successfully")
+        response.status(200).send({message:"Post updated successfully"})
     }catch(e){
         response.status(500).json({message:e.message})
     }
@@ -180,7 +180,7 @@ app.delete("/posts/:id",authenticateAPI,async (request,response)=>{
         const id=request.params.id;
         const deletePost=`DELETE FROM post WHERE id=${id};`;
         await db.run(deletePost)
-        response.status(200).send("Post deleted successfully")
+        response.status(200).send({message:"Post deleted successfully"})
     }catch(e){
         response.status(500).json({message:e.message})
     }
@@ -206,7 +206,7 @@ app.post("/add-comment",authenticateAPI,async(request,response)=>{
         const {description,published}=request.body;
         const insertNewComment=`INSERT INTO comment(description,published) VALUES(${description},"${published}");`;
         await db.run(insertNewComment)
-        response.status(201).send("Comment added successfully")
+        response.status(201).send({message:"Comment added successfully"})
     }catch(e){
         response.status(500).json({message:e.message})
     }
@@ -231,5 +231,5 @@ app.get("/posts/:id/comments",authenticateAPI,async (request,response)=>{
 
 
 app.get("/",async (request,response)=>{
-    response.send("Welcome to ZUI Assignment ")
+    response.send({message:"Welcome to ZUI Assignment"})
 })
